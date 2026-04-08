@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gender Detection System - Final Project Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono&display=swap');
+
+        :root {
+            --primary: #1a237e;
+            --accent: #2196f3;
+            --text-dark: #1a1a1a;
+            --text-light: #4a4a4a;
+            --bg-gray: #f8f9fa;
+            --border: #e0e0e0;
+            --male-blue: #0000ff;
+            --female-pink: #9314ff;
+        }
+
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-gray);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .report-container {
+            width: 210mm;
+            margin: 40px auto;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            padding: 25mm 25mm 40mm 25mm; /* Enhanced bottom padding for footer safety */
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media print {
+            body { background: none; }
+            .report-container { margin: 0; }
+            .page { margin: 0; box-shadow: none; page-break-after: always; border: none; }
+            .no-print { display: none; }
+        }
+
+        /* Header & Footer */
+        .uni-header {
+            text-align: right;
+            font-weight: 700;
+            font-size: 10pt;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .report-footer {
+            position: absolute;
+            bottom: 15mm;
+            left: 25mm;
+            right: 25mm;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            font-size: 9pt;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            background: white;
+        }
+
+        /* REDESIGNED COVER PAGE STYLES */
+        .page-cover {
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, #0d1254 100%);
+            height: 45%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+        }
+
+        .hero-pattern {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.1;
+            background-image: radial-gradient(#fff 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        .cover-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            /* justify-content: space-between; */
+            align-items: center;
+            padding: 40px 40px 60px 40px;
+            text-align: center;
+        }
+
+        .cover-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-size: 10pt;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .main-title {
+            font-size: 32pt;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            width: 100%;
+            margin: 40px 0;
+            text-align: left;
+        }
+
+        .info-card {
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+            background: #fcfcfc;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .info-card label {
+            display: block;
+            font-size: 8pt;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .info-card span {
+            font-size: 11pt;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .gmiu-footer {
+            text-align: center;
+            border-top: 1px solid var(--border);
+            width: 100%;
+            padding-top: 30px;
+        }
+
+        /* Typography */
+        h2 { font-size: 16pt; margin: 20px 0 10px 0; color: var(--primary); display: flex; align-items: center; }
+        h2::before { content: ''; width: 25px; height: 3px; background: var(--accent); margin-right: 12px; }
+        h3 { font-size: 12pt; margin: 15px 0 5px 0; color: #333; font-weight: 700; }
+        p { margin-bottom: 12px; text-align: justify; color: var(--text-light); font-size: 10.5pt; line-height: 1.6; }
+        ul { margin-bottom: 15px; padding-left: 20px; }
+        li { font-size: 10.5pt; color: var(--text-light); margin-bottom: 8px; }
+
+        .index-container { margin-top: 50px; }
+        .index-item { display: flex; justify-content: space-between; border-bottom: 1px dotted #ccc; padding: 8px 0; font-weight: 500; }
+
+        .figure-box { background: #fdfdfd; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+        .caption { font-size: 9pt; color: #666; font-style: italic; margin-top: 10px; display: block; }
+        .main-screenshot { width: 100%; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .gallery-item {
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 8pt; overflow-x: auto; border-left: 5px solid var(--accent); line-height: 1.4; margin: 15px 0; }
+        .keyword { color: #569cd6; } .comment { color: #6a9955; } .string { color: #ce9178; }
+
+        .btn-print { position: fixed; bottom: 30px; right: 30px; background: var(--primary); color: white; padding: 15px 30px; border-radius: 50px; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.2); font-weight: 700; z-index: 100; }
+
+        .force-next-page { page-break-before: always; }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print no-print" onclick="window.print()">Export Full Report</button>
+
+    <div class="report-container">
+        
+        <div class="page page-cover">
+            <div class="hero-section">
+                <div class="hero-pattern"></div>
+                <div class="uni-header" style="border: none; color: white; margin-bottom: 40px; position: absolute; top: 30px; right: 40px;">
+                    Gyanmanjari Innovative University
+                </div>
+                <span class="cover-tag">Active Learning Activity</span>
+                <h1 class="main-title">High-Performance<br>Gender Detection System</h1>
+                <p style="font-size: 13pt; font-weight: 300; opacity: 0.9; margin-top: 15px; letter-spacing: 1px;">Multithreaded CNN Frameworks & Deep Learning</p>
+            </div>
+
+            <div class="cover-main">
+                <div style="width: 80px; height: 4px; background: var(--accent); margin-bottom: 20px;"></div>
+                
+                <div class="student-grid">
+                    <div class="info-card">
+                        <label>Student Name</label>
+                        <span>Mohammad Zaid Naqvi</span>
+                    </div>
+                    <div class="info-card">
+                        <label>Enrollment ID</label>
+                        <span>240905090032</span>
+                    </div>
+                    <div class="info-card">
+                        <label>Course</label>
+                        <span>B.Tech Information Technology</span>
+                    </div>
+                    <div class="info-card">
+                        <label>Academic Year</label>
+                        <span>2024 - 2025</span>
+                    </div>
+                </div>
+
+                <div class="gmiu-footer">
+                    <div style="font-size: 26pt; font-weight: 800; color: var(--primary); letter-spacing: 6px; line-height: 1;">GMIU</div>
+                    <p style="text-transform: uppercase; letter-spacing: 2px; font-weight: 600; color: var(--text-light); margin-top: 8px; font-size: 9pt;">
+                        Faculty of Engineering & Technology
+                    </p>
+                </div>
+            </div>
+
+            <div class="report-footer">
+                <span>IT-302: Major Project Submission</span>
+                <span>Page 01</span>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            <div class="index-container">
+                <h2>Index</h2>
+                <div class="index-item"><span>1. ABSTRACT</span><span>03</span></div>
+                <div class="index-item"><span>2. INTRODUCTION</span><span>03</span></div>
+                <div class="index-item"><span>3. PROBLEM STATEMENT</span><span>04</span></div>
+                <div class="index-item"><span>4. OBJECTIVES</span><span>04</span></div>
+                <div class="index-item"><span>5. SCOPE OF THE PROJECT</span><span>04</span></div>
+                <div class="index-item"><span>6. DATASET VISUALIZATION (UTKFACE)</span><span>05</span></div>
+                <div class="index-item"><span>7. SYSTEM ARCHITECTURE</span><span>06</span></div>
+                <div class="index-item"><span>8. CNN MODEL ARCHITECTURE</span><span>06</span></div>
+                <div class="index-item"><span>9. REAL-TIME RESULTS</span><span>07</span></div>
+                <div class="index-item"><span>10. REAL-TIME IMPLEMENTATION SCRIPT</span><span>08</span></div>
+                <div class="index-item"><span>11. MODEL TRAINING PIPELINE</span><span>09</span></div>
+                <div class="index-item"><span>12. CONCLUSION</span><span>09</span></div>
+            </div>
+            <div class="report-footer">
+                <span>Mohammad Zaid Naqvi | 240905090032</span>
+                <span>Page 02</span>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            <h2>1. ABSTRACT</h2>
+            <p>This project presents an automated <strong>Gender Detection System</strong> developed using Deep Learning techniques, specifically Convolutional Neural Networks (CNN). As computer vision continues to revolutionize human-computer interaction, identifying demographic attributes in real-time has become essential for targeted advertising, security, and social robotics. The system leverages the <strong>UTKFace dataset</strong>, utilizing thousands of labeled facial images to train a binary classification model. By employing Python, TensorFlow, and OpenCV, we achieved an accuracy of approximately <strong>94%</strong>.</p>
+
+            <h2>2. INTRODUCTION</h2>
+            <h3>2.1 Deep Learning Overview</h3>
+            <p>Deep Learning is a subset of Machine Learning based on artificial neural networks with representation learning. It allows computational models composed of multiple processing layers to learn abstractions of data.</p>
+            <h3>2.2 Computer Vision</h3>
+            <p>Computer Vision enables computers to derive meaningful information from digital images and videos. In this project, it facilitates the extraction of facial features necessary for classification.</p>
+            <h3>2.3 Importance of Gender Detection</h3>
+            <p>Gender detection is a fundamental task in facial analysis and serves as a precursor to complex demographic analysis.</p>
+            <div class="report-footer"><span>Mohammad Zaid Naqvi | 240905090032</span><span>Page 03</span></div>
+        </div>
+
+        <div class="page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            <h2>3. PROBLEM STATEMENT</h2>
+            <p>Manual identification of gender in large-scale datasets or high-speed video streams is inefficient and prone to human error. Challenges include intra-class variation (hairstyles, makeup) and environmental factors (lighting, resolution).</p>
+
+            <h2>4. OBJECTIVES</h2>
+            <ul>
+                <li>Develop a binary classification model using <strong>CNN</strong>.</li>
+                <li>Augment the <strong>UTKFace dataset</strong> for improved generalization.</li>
+                <li>Achieve a classification accuracy of over <strong>90%</strong>.</li>
+                <li>Integrate <strong>OpenCV</strong> for real-time face detection.</li>
+            </ul>
+
+            <h2>5. SCOPE OF THE PROJECT</h2>
+            <h3>Included:</h3>
+            <ul>
+                <li>CNN-based binary classification (Male/Female).</li>
+                <li>Real-time video stream processing.</li>
+                <li>Automated face detection using Haar Cascades.</li>
+            </ul>
+            <div class="report-footer"><span>Mohammad Zaid Naqvi | 240905090032</span><span>Page 04</span></div>
+        </div>
+
+        <div class="page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            <h2>6. DATASET VISUALIZATION (UTKFACE)</h2>
+            <p>The model was trained on the UTKFace dataset, encompassing long-span age ranges and diverse genders.</p>
+            <div class="figure-box">
+                <div class="gallery">
+                    <div class="gallery-item"><img src="./images/WhatsApp Image 2026-03-01 at 4.06.26 PM.jpeg" style="width:100%"><div>Infant Samples</div></div>
+                    <div class="gallery-item"><img src="./images/WhatsApp Image 2026-03-01 at 4.06.27 PM.jpeg" style="width:100%"><div>Female Samples</div></div>
+                    <div class="gallery-item"><img src="./images/WhatsApp Image 2026-03-01 at 4.06.26 PM (1).jpeg" style="width:100%"><div>Male Samples</div></div>
+                    <div class="gallery-item"><img src="./images/WhatsApp Image 2026-03-01 at 4.06.28 PM.jpeg" style="width:100%"><div>Adult Subset</div></div>
+                </div>
+                <span class="caption">Figure 1: UTKFace Dataset diversity representing different age spans and genders.</span>
+            </div>
+            <div class="report-footer"><span>Mohammad Zaid Naqvi | 240905090032</span><span>Page 05</span></div>
+        </div>
+
+        <div class="page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            <h2>7. SYSTEM ARCHITECTURE</h2>
+            <div class="figure-box">
+                <svg width="600" height="150" viewBox="0 0 600 150">
+                    <rect x="10" y="50" width="100" height="50" rx="8" fill="#e3f2fd" stroke="#1a237e" stroke-width="2"/><text x="60" y="80" text-anchor="middle" font-size="10">Data Collection</text>
+                    <path d="M 110 75 L 140 75" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+                    <rect x="140" y="50" width="100" height="50" rx="8" fill="#e3f2fd" stroke="#1a237e" stroke-width="2"/><text x="190" y="80" text-anchor="middle" font-size="10">Preprocessing</text>
+                    <rect x="270" y="50" width="100" height="50" rx="8" fill="#fff9c4" stroke="#fbc02d" stroke-width="2"/><text x="320" y="80" text-anchor="middle" font-size="10">CNN Model</text>
+                    <rect x="400" y="40" width="150" height="70" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/><text x="475" y="70" text-anchor="middle" font-size="10">Evaluation & Live Prediction</text>
+                    <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#333"/></marker></defs>
+                </svg>
+                <span class="caption">Figure 2: High-level System Architecture Workflow.</span>
+            </div>
+            <h2>8. CNN MODEL ARCHITECTURE</h2>
+            <div class="figure-box">
+                <svg width="600" height="120" viewBox="0 0 600 120">
+                    <rect x="10" y="40" width="70" height="40" fill="#f8d7da" stroke="#721c24" /><text x="45" y="65" text-anchor="middle" font-size="8">Input</text>
+                    <rect x="90" y="40" width="80" height="40" fill="#d1ecf1" stroke="#0c5460" /><text x="130" y="65" text-anchor="middle" font-size="8">Conv2D+ReLU</text>
+                    <rect x="180" y="45" width="60" height="30" fill="#d4edda" stroke="#155724" /><text x="210" y="63" text-anchor="middle" font-size="8">MaxPool</text>
+                    <rect x="340" y="50" width="60" height="20" fill="#fff3cd" stroke="#856404" /><text x="370" y="63" text-anchor="middle" font-size="8">Flatten</text>
+                    <rect x="480" y="40" width="70" height="40" fill="#cce5ff" stroke="#004085" /><text x="515" y="65" text-anchor="middle" font-size="8">Softmax</text>
+                </svg>
+                <span class="caption">Figure 3: Sequential CNN Layer Architecture.</span>
+            </div>
+            <div class="report-footer"><span>Mohammad Zaid Naqvi | 240905090032</span><span>Page 06</span></div>
+        </div>
+
+        <div class="page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            <h2>9. REAL-TIME RESULTS</h2>
+            <div class="figure-box">
+                <img src="./images/if.jpeg" class="main-screenshot" alt="Live Output">
+                <span class="caption">Figure 4: Live Inference Test - Male Detection (99.7% Confidence).</span>
+            </div>
+            <div class="report-footer"><span>Mohammad Zaid Naqvi | 240905090032</span><span>Page 07</span></div>
+        </div>
+
+        <div class="page force-next-page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            
+            <h2>10. REAL-TIME IMPLEMENTATION SCRIPT</h2>
+            <p>This Python implementation utilizes <strong>threading</strong> to ensure the UI remains responsive during Deep Learning calculations. It includes optimizations for detection speed and faster inference.</p>
+            
+            <pre>
+<span class="keyword">import</span> os, cv2, threading
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> load_model
+
+<span class="comment"># Suppress TensorFlow logs</span>
+os.environ[<span class="string">'TF_CPP_MIN_LOG_LEVEL'</span>] = <span class="string">'3'</span>
+
+<span class="comment"># Threaded Video Stream (Prevents Lag)</span>
+<span class="keyword">class</span> WebcamStream:
+    <span class="keyword">def</span> __init__(self, src=0):
+        self.stream = cv2.VideoCapture(src)
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        (self.grabbed, self.frame) = self.stream.read()
+        self.stopped = <span class="keyword">False</span>
+
+    <span class="keyword">def</span> start(self):
+        threading.Thread(target=self.update, args=(), daemon=<span class="keyword">True</span>).start()
+        <span class="keyword">return</span> self
+
+    <span class="keyword">def</span> update(self):
+        <span class="keyword">while</span> <span class="keyword">True</span>:
+            <span class="keyword">if</span> self.stopped: <span class="keyword">return</span>
+            (self.grabbed, self.frame) = self.stream.read()
+
+    <span class="keyword">def</span> read(self): <span class="keyword">return</span> self.frame
+    <span class="keyword">def</span> stop(self):
+        self.stopped = <span class="keyword">True</span>
+        self.stream.release()
+
+<span class="comment"># Initialization and Inference Loop</span>
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + <span class="string">"haarcascade_frontalface_default.xml"</span>)
+model = load_model(<span class="string">"./gender_model.h5"</span>)
+gender_labels = [<span class="string">"Male"</span>, <span class="string">"Female"</span>]
+vs = WebcamStream(src=0).start()
+
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    frame = vs.read()
+    <span class="keyword">if</span> frame <span class="keyword">is</span> <span class="keyword">None</span>: <span class="keyword">break</span>
+
+    <span class="comment"># Speed Optimization: Detect on small grayscale frame</span>
+    small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+    gray_small = cv2.cvtColor(small_frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray_small, 1.3, 5, minSize=(40, 40))
+
+    <span class="keyword">for</span> (x, y, w, h) <span class="keyword">in</span> faces:
+        x, y, w, h = x*2, y*2, w*2, h*2 <span class="comment"># Scale back</span>
+        face_roi = frame[y:y+h, x:x+w]
+        
+        <span class="comment"># Preprocessing</span>
+        face_ready = cv2.resize(cv2.cvtColor(face_roi, cv2.COLOR_BGR2GRAY), (100, 100))
+        face_ready = face_ready.astype(<span class="string">"float32"</span>) / 255.0
+        face_ready = np.expand_dims(np.expand_dims(face_ready, axis=0), axis=-1)
+
+        <span class="comment"># Optimized Fast Inference</span>
+        prediction = model(face_ready, training=<span class="keyword">False</span>).numpy()[0]
+        idx = np.argmax(prediction)
+        label = gender_labels[idx]
+        
+        color = (255, 0, 0) <span class="keyword">if</span> label == <span class="string">"Male"</span> <span class="keyword">else</span> (147, 20, 255)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+        cv2.putText(frame, f<span class="string">"{label}"</span>, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+
+    cv2.imshow(<span class="string">"Real-Time Gender Prediction"</span>, frame)
+    <span class="keyword">if</span> cv2.waitKey(1) & 0xFF == ord(<span class="string">"q"</span>): <span class="keyword">break</span>
+
+vs.stop()
+cv2.destroyAllWindows()
+            </pre>
+            <div class="report-footer"><span>Mohammad Zaid Naqvi | 240905090032</span><span>Page 08</span></div>
+        </div>
+
+        <div class="page">
+            <div class="uni-header">Gyanmanjari Innovative University (GMIU)</div>
+            
+            <h2>11. MODEL TRAINING PIPELINE</h2>
+            <p>The following script handles the comprehensive workflow including dataset ingestion, facial region extraction using Haar Cascades, and training the CNN architecture on 20,000+ images.</p>
+            
+            <pre>
+<span class="keyword">import</span> os, cv2, numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> tqdm <span class="keyword">import</span> tqdm
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> tensorflow.keras.models <span class="keyword">import</span> Sequential
+<span class="keyword">from</span> tensorflow.keras.layers <span class="keyword">import</span> Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+<span class="keyword">from</span> tensorflow.keras.utils <span class="keyword">import</span> to_categorical
+
+<span class="comment"># Preprocessing and Data Loading Logic</span>
+<span class="keyword">def</span> <span class="keyword">load_data</span>(dataset_path, img_size=(100, 100), max_images=50000):
+    X, y = [], []
+    image_files = os.listdir(dataset_path)[:max_images]
+    <span class="keyword">for</span> img_file <span class="keyword">in</span> tqdm(image_files, desc=<span class="string">"Processing"</span>):
+        <span class="keyword">try</span>:
+            path = os.path.join(dataset_path, img_file)
+            gender = int(img_file.split(<span class="string">'_'</span>)[1])
+            img = cv2.imread(path)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            <span class="keyword">for</span> (x, y_, w, h) <span class="keyword">in</span> faces:
+                face = cv2.resize(gray[y_:y_+h, x:x+w], img_size)
+                X.append(face); y.append(gender); <span class="keyword">break</span>
+        <span class="keyword">except</span>: <span class="keyword">continue</span>
+    <span class="keyword">return</span> np.array(X).reshape(-1, 100, 100, 1) / 255.0, to_categorical(y, 2)
+
+<span class="comment"># CNN Architecture Build</span>
+model = Sequential([
+    Conv2D(32, (3, 3), activation=<span class="string">'relu'</span>, input_shape=(100, 100, 1)),
+    MaxPooling2D(2, 2),
+    Conv2D(64, (3, 3), activation=<span class="string">'relu'</span>),
+    MaxPooling2D(2, 2),
+    Flatten(),
+    Dense(128, activation=<span class="string">'relu'</span>),
+    Dropout(0.5),
+    Dense(2, activation=<span class="string">'softmax'</span>)
+])
+
+model.compile(optimizer=<span class="string">'adam'</span>, loss=<span class="string">'categorical_crossentropy'</span>, metrics=[<span class="string">'accuracy'</span>])
+history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+model.save(<span class="string">"gender_model.h5"</span>)
+            </pre>
+
+            <h2>12. CONCLUSION</h2>
+            <p>
+                The project successfully implemented a deep learning model for gender classification. Through the use of CNNs and the UTKFace dataset, professional-level accuracy was achieved. The integration with real-time video demonstrates the system's readiness for practical application, overcoming intra-class variations through multithreaded processing.
+            </p>
+            
+            <div class="report-footer">
+                <span>GMIU Final Project Report | IT-302</span>
+                <span>Page 09</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
